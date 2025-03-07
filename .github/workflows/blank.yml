@@ -1,6 +1,6 @@
 name: Setup JFrog CLI with OIDC
 
-on: 
+on:
   push:
     tags:
       - "v*" # This triggers the workflow on tags that start with "v"
@@ -13,33 +13,54 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      JFROG_URL: ${{ secrets.JFROG_URL }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup JFrog CLI
         uses: jfrog/setup-jfrog-cli@v4
-        env:
-          JF_URL: https://hts2.jfrog.io/
         with:
           version: '2.73.0'
           oidc-provider-name: manu-oidc-test
           oidc-audience: oidctest
 
-      - name: Generate and Configure JFrog CLI with OIDC
-        id: configure-jfrog-cli
+      - name: Obtain GitHub OIDC Token
+        id: get-oidc-token
         env:
-          JFROG_URL: ${{ secrets.JFROG_URL }}
+          ACTIONS_ID_TOKEN_REQUEST_URL: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_URL }}
+          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
         run: |
-          echo "Configuring JFrog CLI with OIDC..."
+          echo "Requesting GitHub OIDC token..."
+          
+          # Request the OIDC token
+          TOKEN=$(curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+                        "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r '.value')
+          
+          echo "::set-output name=id_token::$TOKEN"
 
-          # Request GitHub OIDC token and set it as an environment variable
-          token=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-          $ACTIONS_ID_TOKEN_REQUEST_URL | jq -r '.value')
+      - name: Configure JFrog CLI with OIDC
+        env:
+          JFROG_URL: https://hts2.jfrog.io/
+          ID_TOKEN: ${{ steps.get-oidc-token.outputs.id_token }}
+        run: |
+          echo "Configuring JFrog CLI with OIDC token..."
 
-          # Configure JFrog CLI using the token
-          echo "Setting JFrog CLI configuration"
-          jf c add my-artifactory-server --url=$JFROG_URL --access-token=$token --interactive=false
+          # Debugging: Output the token length for troubleshooting
+          echo "Token length: ${#ID_TOKEN}"
+
+          # If token is empty, fail the step
+          if [ -z "$ID_TOKEN" ]; then
+            echo "OIDC token is empty"; exit 1;
+          fi
+
+          # Configure JFrog CLI with the obtained token
+          jf c add my-artifactory-server \
+            --url=$JFROG_URL \
+            --access-token=$ID_TOKEN \
+            --interactive=false
 
       - name: Run JFrog CLI
         run: |
