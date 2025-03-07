@@ -1,6 +1,8 @@
 name: Main2DR
 on:
-  workflow_dispatch:
+   push:
+    tags:
+      - "v*" 
 
 permissions:
   id-token: write
