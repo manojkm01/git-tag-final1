@@ -27,7 +27,7 @@ jobs:
         env:  
           JF_URL: https://psblr.jfrog.io
         with:
-          oidc-provider-name: destgithub
+          oidc-provider-name: destgithub1
       
       - name: Download file status.txt from repo
         run: |
