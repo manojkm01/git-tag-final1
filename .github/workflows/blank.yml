@@ -2,8 +2,8 @@ name: Setup JFrog CLI with OIDC
 
 on:
   push:
-    tags:
-      - "v*" # This triggers the workflow on tags that start with "v"
+    branches:
+      - main
 
 jobs:
   auth:
