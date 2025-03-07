@@ -1,45 +1,34 @@
-name: Push Build to Artifactory
-
+name: Main2DR
 on:
   push:
-    branches:
-      - '*'  # This triggers the workflow on any push to any branch
+    tags:
+      - "v*"
 
+permissions:
+  id-token: write
+  contents: write
+  
 jobs:
+  # This workflow contains a single job called "build"
   build:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     steps:
-      # This action checks out the code from the repository
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      # This action sets up the JFrog CLI with Artifactory URL and a predefined Artifactory OIDC integration name
-      - uses: jfrog/setup-jfrog-cli@v4
+      # checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          version: '2.73.0'
+          ref: 'refs/heads/main'
+        
+      - name: Setup JFrog CLI for SAAS main
+        uses: jfrog/setup-jfrog-cli@v4
+        id: setup-cli-main
+        env:  
+          JF_URL: https://hts2.jfrog.io
+        with:
           oidc-provider-name: manoj-git
-          oidc-audience: manoj-test
-        env:
-          JF_URL: https://hts2.jfrog.io/
-
-      # This command adds a new server configuration to the JFrog CLI as an alternative to using the setup-jfrog-cli action
-      - run: |
-          export SERVER_ID="test"
-          jf c add $SERVER_ID --url=$JF_URL --access-token=$JF_ACCESS_TOKEN --interactive=false
-
-      # This action creates a new test file and uploads it to Artifactory
-      - name: Push Build to Artifactory
+      
+      - name: Download file status.txt from repo
         run: |
-          echo "test file" > test.txt
-          export BUILD_NAME="my-build"
-          export BUILD_MODULE="my-module"
-          export BUILD_NUMBER="1"
-          export PATH_TO_DIRECTORY="name/version/dates"
-          jf rt upload "test.txt" example-repo-local/$PATH_TO_DIRECTORY --build-name $BUILD_NAME --build-number $BUILD_NUMBER --module $BUILD_MODULE
-
-      # This action publishes the build information to Artifactory and deletes older builds
-      - name: Publish Build to Artifactory
-        run: |
-          jf rt build-publish $BUILD_NAME $BUILD_NUMBER
-          jf rt bdi c --max-builds=1
+          jf c s 
