@@ -26,6 +26,7 @@ jobs:
           JF_URL: https://psblr.jfrog.io
         with:
           oidc-provider-name: destgithub
+          oidc-audience: manoj
       
       - name: Download file status.txt from repo
         run: |
