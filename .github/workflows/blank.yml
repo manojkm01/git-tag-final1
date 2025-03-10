@@ -23,10 +23,9 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v4
         id: setup-cli-main
         env:  
-          JF_URL: https://hts2.jfrog.io
+          JF_URL: https://psblr.jfrog.io
         with:
-          oidc-provider-name: manoj-git
-          oidc-audience: manoj
+          oidc-provider-name: destgithub
       
       - name: Download file status.txt from repo
         run: |
