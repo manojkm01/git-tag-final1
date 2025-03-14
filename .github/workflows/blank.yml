@@ -23,7 +23,7 @@ jobs:
         uses: jfrog/setup-jfrog-cli@v4
         id: setup-cli-main
         env:  
-          JF_URL: https://hts2.jfrog.io
+          JF_URL: https://incloudmaster.jfrog.io
         with:
           oidc-provider-name: manoj-git
       
