@@ -1,6 +1,6 @@
 name: Main2DR
 on:
- workflow_dispatch:
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -26,7 +26,6 @@ jobs:
           JF_URL: https://hts2.jfrog.io
         with:
           oidc-provider-name: manoj-git
-          oidc-audience: manoj
       
       - name: Download file status.txt from repo
         run: |
