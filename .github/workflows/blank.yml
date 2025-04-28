@@ -26,7 +26,7 @@ jobs:
           JF_URL: https://hts2.jfrog.io 
         with:
           oidc-provider-name: manoj-git
-          oidc-audience: manoj
+          oidc-audience: https://github.com/Direct-Line-Group
       - name: Download file status.txt from repo
         run: |
           jf c s 
