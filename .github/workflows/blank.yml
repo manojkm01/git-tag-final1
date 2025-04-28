@@ -21,7 +21,6 @@ jobs:
         
       - name: Setup JFrog CLI for SAAS main
         uses: jfrog/setup-jfrog-cli@v4
-        id: setup-cli-main
         env:  
           JF_URL: https://hts2.jfrog.io 
         with:
