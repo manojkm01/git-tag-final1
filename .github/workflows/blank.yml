@@ -16,7 +16,9 @@ jobs:
       # checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
         uses: actions/checkout@v4
-        
+        with:
+          ref: 'refs/heads/main'
+         
       - name: Setup JFrog CLI for SAAS main
         uses: jfrog/setup-jfrog-cli@v4
         id: setup-cli-main
